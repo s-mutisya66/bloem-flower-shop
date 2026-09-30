@@ -37,7 +37,6 @@
   .cart-btn{position:relative;font-size:15px;}
   .cart-count{position:absolute;top:-8px;right:-14px;background:var(--rose);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center;}
 
-  /* HERO */
   .hero{position:relative;height:68vh;min-height:460px;max-height:660px;overflow:hidden;}
   .hero-parallax{position:absolute;inset:-10% 0;will-change:transform;overflow:hidden;}
   .hero-parallax img{width:100%;height:100%;object-fit:cover;transform:scale(1.03) translate(0,0);transition:transform 6s ease;}
@@ -78,7 +77,6 @@
   .card .add{margin-top:8px;font-size:13px;text-decoration:underline;text-underline-offset:3px;transition:color .15s ease;}
   .card .add:hover{color:var(--rose);}
 
-  /* PRODUCT DETAIL */
   .detail-wrap{max-width:900px;margin:0 auto;padding:40px 24px 90px;}
   .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
   .detail-thumb{aspect-ratio:4/5;border-radius:8px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
@@ -91,7 +89,6 @@
   .qty-row .qty-ctrl button{width:30px;height:30px;font-size:16px;}
   @media (max-width:640px){ .detail-grid{grid-template-columns:1fr;} }
 
-  /* ADMIN */
   .admin-wrap{max-width:900px;margin:0 auto;padding:40px 24px 90px;}
   .admin-table{width:100%;border-collapse:collapse;margin-bottom:44px;font-size:14px;}
   .admin-table th{text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);opacity:.7;font-size:13px;}
@@ -102,7 +99,6 @@
   .order-card{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:12px;font-size:14px;}
   .order-card .oh{display:flex;justify-content:space-between;margin-bottom:6px;font-weight:700;}
 
-  /* CART DRAWER */
   .overlay{position:fixed;inset:0;background:rgba(58,42,52,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;}
   .overlay.open{opacity:1;pointer-events:auto;}
   .drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,92vw);background:var(--white);z-index:31;transform:translateX(100%);transition:transform .3s ease;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
@@ -124,7 +120,6 @@
   .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
   .empty-note{opacity:.6;font-size:14px;padding:30px 0;text-align:center;}
 
-  /* CHECKOUT VIEW */
   .checkout-wrap{max-width:640px;margin:0 auto;padding:40px 24px 90px;}
   .steps{display:flex;gap:24px;margin-bottom:34px;border-bottom:1px solid var(--line);}
   .steps span{padding-bottom:12px;font-size:14px;opacity:.45;position:relative;}
@@ -136,6 +131,10 @@
   .field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:4px;background:var(--white);color:var(--plum);font-family:inherit;font-size:15px;}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .demo-note{background:var(--blush);border-radius:6px;padding:12px 14px;font-size:13px;margin-bottom:20px;}
+  .mpesa-spinner{width:48px;height:48px;border-radius:50%;border:4px solid var(--line);border-top-color:#4CAF50;margin:0 auto;animation:mpesa-spin 1s linear infinite;}
+  @keyframes mpesa-spin{to{transform:rotate(360deg);}}
+  .mpesa-btn{background:#4CAF50 !important;}
+  .mpesa-btn:hover:not(:disabled){box-shadow:0 6px 16px rgba(76,175,80,.35) !important;}
   .order-line{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line);}
   .total-line{display:flex;justify-content:space-between;font-size:18px;font-family:'Cormorant Garamond',serif;margin-top:14px;}
   .step-actions{display:flex;justify-content:space-between;margin-top:26px;}
@@ -190,7 +189,7 @@
     <div class="grid" id="product-grid"></div>
   </section>
 
-  <footer>Bloem &amp; Co. — a portfolio project. Payment is simulated; no real transactions are made.</footer>
+  <footer>Bloem &amp; Co. — a portfolio project.</footer>
 </main>
 
 <div id="admin-view" hidden></div>
@@ -435,6 +434,8 @@ const shopView = document.getElementById('shop-view');
 const checkoutView = document.getElementById('checkout-view');
 let checkoutStep = 'delivery'; // delivery -> payment -> review -> confirm
 let orderInfo = {};
+let paymentStage = 'enter'; // enter -> waiting (M-Pesa STK push simulation)
+let mpesaTimer = null;
 
 document.getElementById('checkout-btn').addEventListener('click', ()=>{
   if(cartCount()===0) return;
@@ -492,40 +493,59 @@ function renderCheckout(){
     });
   }
   else if(checkoutStep==='payment'){
+    const amount = fmt(cartTotal());
+    if(paymentStage === 'waiting'){
+      checkoutView.innerHTML = `<div class="checkout-wrap">
+        ${stepsBar()}
+        <div style="text-align:center;padding:36px 0;">
+          <div class="mpesa-spinner"></div>
+          <h2 style="font-size:24px;margin:22px 0 8px;">STK push sent</h2>
+          <p style="opacity:.75;max-width:36ch;margin:0 auto;">Check your phone <strong>${orderInfo.mpesaPhone}</strong> and enter your M-Pesa PIN to pay ${amount}.</p>
+          <button class="link-btn" style="margin-top:24px;" id="mpesa-cancel">Cancel</button>
+        </div>
+      </div>`;
+      document.getElementById('mpesa-cancel').addEventListener('click', ()=>{ paymentStage='enter'; renderCheckout(); });
+      clearTimeout(mpesaTimer);
+      mpesaTimer = setTimeout(()=>{
+        orderInfo.mpesaCode = 'S' + Math.random().toString(36).slice(2,9).toUpperCase();
+        paymentStage = 'enter';
+        checkoutStep = 'review';
+        renderCheckout();
+      }, 2600);
+      return;
+    }
     checkoutView.innerHTML = `<div class="checkout-wrap">
       ${stepsBar()}
       <h2 style="font-size:26px;margin-bottom:14px;">Payment</h2>
-      <div class="demo-note">This is a portfolio demo — no real payment is processed and no card details are stored.</div>
-      <div class="field"><label>Name on card</label><input id="c-name" value="${orderInfo.cardName||''}" placeholder="Jane Wanjiru"></div>
-      <div class="field"><label>Card number</label><input id="c-number" inputmode="numeric" maxlength="19" value="${orderInfo.cardNumber||''}" placeholder="4242 4242 4242 4242"></div>
-      <div class="field-row">
-        <div class="field"><label>Expiry</label><input id="c-exp" placeholder="MM/YY" value="${orderInfo.exp||''}"></div>
-        <div class="field"><label>CVC</label><input id="c-cvc" inputmode="numeric" maxlength="3" placeholder="123" value="${orderInfo.cvc||''}"></div>
+      <div class="demo-note">This is a portfolio demo — no real M-Pesa request is sent and no money moves.</div>
+      <div class="field">
+        <label>M-Pesa phone number</label>
+        <input id="mpesa-phone" inputmode="numeric" maxlength="13" value="${orderInfo.mpesaPhone||''}" placeholder="07XX XXX XXX">
       </div>
+      <p style="opacity:.65;font-size:13px;margin:-8px 0 20px;">You'll receive a prompt on your phone to enter your M-Pesa PIN and confirm payment of ${amount}.</p>
       <div class="step-actions">
         <button class="link-btn" id="back-delivery">&larr; Back</button>
-        <button class="btn-primary" style="width:auto;padding:12px 28px;" id="to-review">Review order</button>
+        <button class="btn-primary mpesa-btn" style="width:auto;padding:12px 28px;" id="to-mpesa">Pay ${amount} with M-Pesa</button>
       </div>
     </div>`;
     document.getElementById('back-delivery').addEventListener('click', ()=>{ checkoutStep='delivery'; renderCheckout(); });
-    document.getElementById('to-review').addEventListener('click', ()=>{
-      orderInfo.cardName = document.getElementById('c-name').value.trim();
-      orderInfo.cardNumber = document.getElementById('c-number').value.trim();
-      orderInfo.exp = document.getElementById('c-exp').value.trim();
-      orderInfo.cvc = document.getElementById('c-cvc').value.trim();
-      if(!orderInfo.cardName || orderInfo.cardNumber.replace(/\s/g,'').length<12){ alert('Please add card name and a card number.'); return; }
-      checkoutStep='review'; renderCheckout();
+    document.getElementById('to-mpesa').addEventListener('click', ()=>{
+      const phone = document.getElementById('mpesa-phone').value.trim();
+      const digits = phone.replace(/\D/g,'');
+      if(digits.length < 9){ alert('Please enter a valid M-Pesa phone number (e.g. 07XX XXX XXX).'); return; }
+      orderInfo.mpesaPhone = phone;
+      paymentStage = 'waiting';
+      renderCheckout();
     });
   }
   else if(checkoutStep==='review'){
-    const last4 = (orderInfo.cardNumber||'').replace(/\s/g,'').slice(-4);
     checkoutView.innerHTML = `<div class="checkout-wrap">
       ${stepsBar()}
       <h2 style="font-size:26px;margin-bottom:18px;">Review &amp; confirm</h2>
       <div class="field"><label>Deliver to</label><div>${orderInfo.name} &middot; ${orderInfo.address}</div></div>
       <div class="field"><label>Contact</label><div>${orderInfo.email||'—'} &middot; ${orderInfo.phone||'—'}</div></div>
       <div class="field"><label>Delivery date</label><div>${orderInfo.date||'To be confirmed'}</div></div>
-      <div class="field"><label>Paying with</label><div>Card ending in ${last4 || '••••'}</div></div>
+      <div class="field"><label>Paying with</label><div>M-Pesa &middot; ${orderInfo.mpesaPhone || '—'} ${orderInfo.mpesaCode ? `&middot; Ref ${orderInfo.mpesaCode}` : ''}</div></div>
       <h3 style="font-size:20px;margin:22px 0 8px;">Order</h3>
       ${orderSummaryHTML()}
       <div class="step-actions">
@@ -552,7 +572,8 @@ function renderCheckout(){
     checkoutView.innerHTML = `<div class="checkout-wrap confirm">
       <div class="mark">&#10003;</div>
       <h2>Order placed</h2>
-      <p style="opacity:.75;margin-bottom:24px;">Order ${orderInfo.orderNum} — a confirmation would normally be sent to ${orderInfo.email||'your email'}.</p>
+      <p style="opacity:.75;margin-bottom:6px;">Order ${orderInfo.orderNum} — a confirmation would normally be sent to ${orderInfo.email||'your email'}.</p>
+      <p style="opacity:.6;font-size:14px;margin-bottom:24px;">M-Pesa confirmation code: <strong>${orderInfo.mpesaCode||'—'}</strong></p>
       <button class="btn-primary" style="width:auto;padding:12px 28px;margin:0 auto;" id="back-to-shop">Back to shop</button>
     </div>`;
     document.getElementById('back-to-shop').addEventListener('click', ()=>{
