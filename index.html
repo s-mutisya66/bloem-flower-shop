@@ -213,15 +213,15 @@
 
 <script>
 const PRODUCTS = [
-  {id:'p1', name:'Red Roses Bundle', price:38, tag:'roses', color:'#C81E3A', img:'images/Roses bouq.jpg', desc:'Soft pink roses and stock, gathered in a hand-tied bundle that looks like it was picked from a garden.'},
+  {id:'p1', name:'Red Roses Bundle', price:38, tag:'roses', color:'#C81E3A', img:'images/Roses bouq.jpg', desc:'Soft red roses and stock, gathered in a hand-tied bundle that looks like it was picked from a garden.'},
   {id:'p2', name:'Hot Pink Ranunculus Posy', price:32, tag:'seasonal', color:'#FF3E8E', img:'images/blush ranunculus.jfif', desc:'Vivid pink ranunculus and stock, wrapped small enough to sit on a nightstand.'},
-  {id:'p3', name:'Blush & Peony', price:52, tag:'peonies', color:'#D6123C', img:'images/peony.jpg', desc:'Eight richly saturated red peonies at full bloom — the showpiece for a table that needs one thing to talk about.'},
-  {id:'p4', name:'White and pink roses bundle', price:29, tag:'roses', color:'#E0227A', img:'images/white and pink roses.jpg', desc:'Whatever is growing this week in hot pinks and reds, gathered like it was picked from a roadside.'},
-  {id:'p5', name:'Tulips', price:34, tag:'tulips', color:'#B4102B', img:'images/tulips.jpg', desc:'Layered, paper-thin ranunculus petals in deep rouge, arranged tight and low in a hand-tied dome.'},
+  {id:'p3', name:'Blush & Peony', price:52, tag:'peonies', color:'#D6123C', img:'images/peony.jpg', desc:'Eight richly saturated pink and white peonies at full bloom. The showpiece for a table that needs one thing to talk about.'},
+  {id:'p4', name:'White and pink roses bundle', price:29, tag:'roses', color:'#E0227A', img:'images/white and pink roses.jpg', desc:'Whatever is growing this week in hot pinks and whites, gathered like it was picked from a garden.'},
+  {id:'p5', name:'Tulips', price:34, tag:'tulips', color:'#B4102B', img:'images/tulips.jpg', desc:'A dozen tulips in a mix of deep pinks and reds, gathered in a hand-tied bundle that looks like it was picked from a garden.'},
   {id:'p6', name:'Dried Rose Sheaf', price:24, tag:'dried', color:'#8A1228', img:'images/Dried Flower Sheaf.jpg', desc:'A bound sheaf of dried red roses that keeps its colour for months — no water needed.'},
-  {id:'p7', name:'Garden rose bundle', price:36, tag:'roses', color:'#C21463', img:'images/Garden Rose Bundle.jpg', desc:'Dark-centred anemones in magenta and crimson, a bold, graphic take on a bouquet.'},
-  {id:'p8', name:'Lilies', price:46, tag:'lilies', color:'#FF5C8A', img:'images/Lilies.jpg', desc:'Vibrant pink peonies wrapped tight — six blooms doing all the work.'},
-  {id:'p9', name:'Sage and Green', price:27, tag:'dried', color:'#9E1030', img:'images/sage and green.jpg', desc:'Dried straw flower and gypsophila dyed deep red and pink — a bouquet with no expiry date.'},
+  {id:'p7', name:'Garden rose bundle', price:36, tag:'roses', color:'#C21463', img:'images/Garden Rose Bundle.jpg', desc:'A hand-tied bundle of garden roses in deep pinks and reds, gathered like it was picked from a garden.'},
+  {id:'p8', name:'Lilies', price:46, tag:'lilies', color:'#FF5C8A', img:'images/Lilies.jpg', desc:'A dozen lilies in a mix of deep pinks and reds, gathered in a hand-tied bundle that looks like it was picked from a garden.'},
+  {id:'p9', name:'Sage and Green', price:27, tag:'dried', color:'#9E1030', img:'images/sage and green.jpg', desc:'A bound sheaf of dried sage and greenery that keeps its colour for months — no water needed.'},
 ];
 const TAGS = ['all', ...Array.from(new Set(PRODUCTS.map(p=>p.tag)))];
 let cart = {}; // id -> qty
