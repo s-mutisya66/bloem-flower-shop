@@ -210,15 +210,15 @@
 
 <script>
 const PRODUCTS = [
-  {id:'p1', name:'Rose Pink Bundle', price:38, tag:'roses', color:'#E6197A', img:'https://loremflickr.com/600/750/pink,rose,flower/all?lock=101', desc:'A dozen vivid pink garden roses, cut long for a loose, unstructured hand-tie.'},
-  {id:'p2', name:'Hot Pink Ranunculus Posy', price:32, tag:'seasonal', color:'#FF3E8E', img:'https://loremflickr.com/600/750/pink,ranunculus,flower/all?lock=102', desc:'Vivid pink ranunculus and stock, wrapped small enough to sit on a nightstand.'},
-  {id:'p3', name:'Magenta Peony Cloud', price:52, tag:'peonies', color:'#F0217E', img:'https://loremflickr.com/600/750/pink,peony,flower/all?lock=103', desc:'Eight richly saturated magenta peonies at full bloom — the showpiece for a table that needs one thing to talk about.'},
-  {id:'p4', name:'Fuchsia Meadow Mix', price:29, tag:'seasonal', color:'#E0227A', img:'https://loremflickr.com/600/750/fuchsia,wildflower,pink/all?lock=104', desc:'Whatever is growing this week in hot pinks and fuchsias, gathered like it was picked from a roadside.'},
-  {id:'p5', name:'Rouge Pink Ranunculus', price:34, tag:'roses', color:'#D6236C', img:'https://loremflickr.com/600/750/pink,ranunculus,flower/all?lock=105', desc:'Layered, paper-thin ranunculus petals in deep rouge-pink, arranged tight and low in a hand-tied dome.'},
-  {id:'p6', name:'Dried Pink Rose Sheaf', price:24, tag:'dried', color:'#B81658', img:'https://loremflickr.com/600/750/dried,pink,rose/all?lock=106', desc:'A bound sheaf of dried pink roses that keeps its colour for months — no water needed.'},
-  {id:'p7', name:'Magenta Anemone Study', price:36, tag:'seasonal', color:'#C21463', img:'https://loremflickr.com/600/750/magenta,anemone,flower/all?lock=107', desc:'Dark-centred anemones in magenta and pink, a bold, graphic take on a bouquet.'},
-  {id:'p8', name:'Blush & Peony', price:46, tag:'peonies', color:'#FF5C8A', img:'https://loremflickr.com/600/750/pink,peony,bouquet/all?lock=108', desc:'Vibrant pink peonies wrapped tight — six blooms doing all the work.'},
-  {id:'p9', name:'Everlasting Pink Mix', price:27, tag:'dried', color:'#A81050', img:'https://loremflickr.com/600/750/dried,pink,flowers/all?lock=109', desc:'Dried straw flower and gypsophila dyed deep pink and magenta — a bouquet with no expiry date.'},
+  {id:'p1', name:'Red Roses Bundle', price:38, tag:'roses', color:'#C81E3A', img:'images/Roses bouq.jpg', desc:'Soft pink roses and stock, gathered in a hand-tied bundle that looks like it was picked from a garden.'},
+  {id:'p2', name:'Hot Pink Ranunculus Posy', price:32, tag:'seasonal', color:'#FF3E8E', img:'images/blush ranunculus.jfif', desc:'Vivid pink ranunculus and stock, wrapped small enough to sit on a nightstand.'},
+  {id:'p3', name:'Blush & Peony', price:52, tag:'peonies', color:'#D6123C', img:'images/peony.jpg', desc:'Eight richly saturated red peonies at full bloom — the showpiece for a table that needs one thing to talk about.'},
+  {id:'p4', name:'White and pink roses bundle', price:29, tag:'roses', color:'#E0227A', img:'images/white and pink roses.jpg', desc:'Whatever is growing this week in hot pinks and reds, gathered like it was picked from a roadside.'},
+  {id:'p5', name:'Tulips', price:34, tag:'tulips', color:'#B4102B', img:'images/tulips.jpg', desc:'Layered, paper-thin ranunculus petals in deep rouge, arranged tight and low in a hand-tied dome.'},
+  {id:'p6', name:'Dried Rose Sheaf', price:24, tag:'dried', color:'#8A1228', img:'images/Dried Flower Sheaf.jpg', desc:'A bound sheaf of dried red roses that keeps its colour for months — no water needed.'},
+  {id:'p7', name:'Garden rose bundle', price:36, tag:'roses', color:'#C21463', img:'images/Garden Rose Bundle.jpg', desc:'Dark-centred anemones in magenta and crimson, a bold, graphic take on a bouquet.'},
+  {id:'p8', name:'Lilies', price:46, tag:'lilies', color:'#FF5C8A', img:'images/lilies.jpg', desc:'Vibrant pink peonies wrapped tight — six blooms doing all the work.'},
+  {id:'p9', name:'Sage and Green', price:27, tag:'dried', color:'#9E1030', img:'images/Sage and Green.jpg', desc:'Dried straw flower and gypsophila dyed deep red and pink — a bouquet with no expiry date.'},
 ];
 const TAGS = ['all', ...Array.from(new Set(PRODUCTS.map(p=>p.tag)))];
 let cart = {}; // id -> qty
