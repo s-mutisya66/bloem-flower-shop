@@ -39,9 +39,9 @@
 
   /* HERO */
   .hero{position:relative;height:68vh;min-height:460px;max-height:660px;overflow:hidden;}
-  .hero-parallax{position:absolute;inset:-10% 0;will-change:transform;}
-  .hero-parallax img{width:100%;height:100%;object-fit:cover;transform:scale(1.03);animation:kenburns 24s ease-in-out infinite alternate;}
-  @keyframes kenburns{0%{transform:scale(1.03) translate(0,0);}100%{transform:scale(1.16) translate(-1.5%,-1%);}}
+  .hero-parallax{position:absolute;inset:-10% 0;will-change:transform;overflow:hidden;}
+  .hero-parallax img{width:100%;height:100%;object-fit:cover;transform:scale(1.03) translate(0,0);transition:transform 6s ease;}
+  .hero:hover .hero-parallax img{transform:scale(1.16) translate(-1.5%,-1%);}
   .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg, rgba(58,13,20,.25) 0%, rgba(58,13,20,.45) 55%, rgba(58,13,20,.82) 100%);}
   .hero-inner{position:relative;z-index:2;height:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;justify-content:flex-end;padding:0 24px 54px;}
   .hero h1{font-size:clamp(40px,6.5vw,70px);line-height:1.02;font-style:italic;font-weight:500;color:#fff;}
@@ -161,7 +161,6 @@
     <div class="brand">Bloem &amp; Co.</div>
     <nav class="navlinks">
       <button id="nav-shop" class="active">Shop</button>
-      <button id="nav-admin">Admin</button>
     </nav>
     <button class="cart-btn" id="open-cart">Cart <span class="cart-count" id="cart-count" hidden>0</span></button>
   </div>
@@ -563,13 +562,15 @@ function renderCheckout(){
 }
 
 // ---- Admin view ----
+// Admin has no visible nav link. The owner reaches it by going to the site's
+// URL with #admin on the end (e.g. yourdomain.com/#admin) — bookmark that.
 const navShop = document.getElementById('nav-shop');
-const navAdmin = document.getElementById('nav-admin');
 const adminView = document.getElementById('admin-view');
 
-function goShop(){
+function goShop(clearHash=true){
   shopView.hidden=false; adminView.hidden=true; detailView.hidden=true; checkoutView.hidden=true;
-  navShop.classList.add('active'); navAdmin.classList.remove('active');
+  navShop.classList.add('active');
+  if(clearHash && location.hash==='#admin') history.replaceState(null,'',location.pathname+location.search);
 }
 // Demo-only client-side password gate — visible in source, not real security.
 // Change this before sharing the link; use a real auth/back-end for a live store.
@@ -578,12 +579,16 @@ let adminAuthed = sessionStorage.getItem('bloem_admin_auth') === '1';
 
 function goAdmin(){
   shopView.hidden=true; detailView.hidden=true; checkoutView.hidden=true; adminView.hidden=false;
-  navAdmin.classList.add('active'); navShop.classList.remove('active');
+  navShop.classList.remove('active');
   adminAuthed ? renderAdmin() : renderAdminLogin();
   window.scrollTo(0,0);
 }
-navShop.addEventListener('click', goShop);
-navAdmin.addEventListener('click', goAdmin);
+navShop.addEventListener('click', ()=> goShop());
+
+function routeFromHash(){
+  if(location.hash === '#admin') goAdmin(); else goShop(false);
+}
+window.addEventListener('hashchange', routeFromHash);
 
 function renderAdminLogin(){
   adminView.innerHTML = `<div class="admin-wrap" style="max-width:340px;">
@@ -675,6 +680,7 @@ loadOrders();
 renderFilters();
 renderGrid();
 renderCart();
+routeFromHash();
 </script>
 </body>
 </html>
