@@ -59,17 +59,10 @@
   #catalog{background:linear-gradient(180deg, var(--blush) 0%, var(--cream) 340px);}
   .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:8px;}
   .section-head h2{font-size:34px;font-style:italic;color:var(--rose);}
-  .cat-section{border-bottom:1px solid var(--line);}
-  .cat-section:first-child{border-top:1px solid var(--line);}
-  .cat-header{width:100%;display:flex;align-items:center;justify-content:space-between;padding:18px 4px;text-align:left;font-family:'Cormorant Garamond',serif;}
-  .cat-header .cat-name{font-size:24px;font-style:italic;color:var(--plum);}
-  .cat-header .cat-meta{display:flex;align-items:center;gap:14px;}
-  .cat-header .cat-count{font-family:'Karla',sans-serif;font-size:13px;opacity:.6;}
-  .cat-chevron{display:inline-block;transition:transform .3s ease;font-size:14px;color:var(--rose);}
-  .cat-section.open .cat-chevron{transform:rotate(180deg);}
-  .cat-body{max-height:0;overflow:hidden;transition:max-height .45s ease;}
-  .cat-section.open .cat-body{max-height:3000px;}
-  .cat-body .grid{padding:8px 4px 28px;}
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .filter-row button{font-size:14px;padding:6px 14px;border:1px solid var(--line);border-radius:20px;transition:border-color .15s ease, color .15s ease;}
+  .filter-row button.active{background:var(--rose);color:#fff;border-color:var(--rose);}
+  .filter-row button:hover:not(.active){border-color:var(--rose);color:var(--rose);}
   .social-row{display:flex;gap:16px;margin-top:20px;}
   .social-btn{width:48px;height:48px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;letter-spacing:.02em;color:var(--rose);text-decoration:none;transition:transform .15s ease, background .15s ease, color .15s ease;}
   .social-btn:hover{background:var(--rose);color:#fff;transform:translateY(-3px);}
@@ -189,18 +182,19 @@
     <div class="hero-inner">
       <h1>Flowers for<br>the moment.</h1>
       <p>Small-batch bouquets, arranged the morning they're delivered. Locally grown where we can, always seasonal.</p>
-      <a href="#catalog" class="cta">Browse the shop</a>
+      <a href="#catalog" class="cta" id="browse-shop-btn">Browse the shop</a>
     </div>
     <div class="ribbon" aria-hidden="true">
       <svg viewBox="0 0 1080 44" preserveAspectRatio="none"><path d="M0,22 C 270,44 810,0 1080,22 L1080,44 L0,44 Z" fill="var(--blush)"></path></svg>
     </div>
   </section>
 
-  <section id="catalog">
+  <section id="catalog" hidden>
     <div class="section-head">
       <h2>The catalog</h2>
+      <div class="filter-row" id="filters"></div>
     </div>
-    <div id="category-accordion"></div>
+    <div class="grid" id="product-grid"></div>
   </section>
 
   <section id="contact">
@@ -294,8 +288,10 @@ function flowerSVG(tag, color){
     <circle cx="50" cy="50" r="7" fill="${c}" opacity=".95"/>
   </svg>`;
 }
-const accordionEl = document.getElementById('category-accordion');
-const openCategories = new Set(); // tags currently expanded
+const grid = document.getElementById('product-grid');
+const filtersEl = document.getElementById('filters');
+const catalogSection = document.getElementById('catalog');
+let activeFilter = 'all';
 
 function cardHTML(p){
   const soldOut = (stock[p.id]||0) <= 0;
@@ -313,56 +309,46 @@ function cardHTML(p){
   `;
 }
 
-function categoryLabel(tag){ return tag.charAt(0).toUpperCase() + tag.slice(1); }
+function renderFilters(){
+  filtersEl.innerHTML = TAGS.map(t=>`<button data-tag="${t}" class="${t===activeFilter?'active':''}">${t}</button>`).join('');
+  filtersEl.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{ activeFilter=b.dataset.tag; renderFilters(); renderGrid(); }));
+}
 
 function renderGrid(){
-  const categories = TAGS.filter(t=>t!=='all');
-  accordionEl.innerHTML = categories.map(tag=>{
-    const items = PRODUCTS.filter(p=>p.tag===tag);
-    const isOpen = openCategories.has(tag);
-    return `
-    <div class="cat-section ${isOpen?'open':''}" data-tag="${tag}">
-      <button class="cat-header" data-toggle="${tag}">
-        <span class="cat-name">${categoryLabel(tag)}</span>
-        <span class="cat-meta"><span class="cat-count">${items.length} item${items.length===1?'':'s'}</span><span class="cat-chevron">&#9662;</span></span>
-      </button>
-      <div class="cat-body">
-        <div class="grid">${items.map(cardHTML).join('')}</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  accordionEl.querySelectorAll('[data-toggle]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const tag = btn.dataset.toggle;
-      openCategories.has(tag) ? openCategories.delete(tag) : openCategories.add(tag);
-      const section = btn.closest('.cat-section');
-      section.classList.toggle('open');
-      if(section.classList.contains('open')) revealCards(section);
-    });
-  });
-  accordionEl.querySelectorAll('[data-add]').forEach(btn=>{
+  const list = activeFilter==='all' ? PRODUCTS : PRODUCTS.filter(p=>p.tag===activeFilter);
+  grid.innerHTML = list.map(cardHTML).join('');
+  grid.querySelectorAll('[data-add]').forEach(btn=>{
     btn.addEventListener('click', e=>{ e.stopPropagation(); addToCart(btn.dataset.add); });
   });
-  accordionEl.querySelectorAll('.card').forEach(card=>{
+  grid.querySelectorAll('.card').forEach(card=>{
     card.addEventListener('click', ()=> openDetail(card.dataset.id));
   });
-  accordionEl.querySelectorAll('.cat-section.open').forEach(revealCards);
+  revealCards();
 }
 
 let revealObserver = null;
-function revealCards(scope){
-  const root = scope || document;
+function revealCards(){
   if(!revealObserver){
     revealObserver = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); revealObserver.unobserve(e.target); } });
     }, {threshold:.15});
   }
-  root.querySelectorAll('.card:not(.in-view)').forEach(c=> revealObserver.observe(c));
+  grid.querySelectorAll('.card:not(.in-view)').forEach(c=> revealObserver.observe(c));
 }
 
+// The catalog is hidden until "Browse the shop" (or the Shop nav link) is clicked —
+// the homepage is just the header and the Contact section.
+function openCatalog(){
+  catalogSection.hidden = false;
+  requestAnimationFrame(()=> catalogSection.scrollIntoView({behavior:'smooth', block:'start'}));
+}
+document.getElementById('browse-shop-btn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  openCatalog();
+});
+
 const detailView = document.getElementById('detail-view');
-function openDetail(id){
+function openDetail(id, push=true){
   const p = PRODUCTS.find(p=>p.id===id);
   if(!p) return;
   let qty = 1;
@@ -388,18 +374,21 @@ function openDetail(id){
         </div>
       </div>
     </div>`;
-    document.getElementById('detail-back').addEventListener('click', ()=>{ detailView.hidden=true; shopView.hidden=false; });
+    document.getElementById('detail-back').addEventListener('click', ()=>{ history.back(); });
     const inc = document.getElementById('d-inc'), dec = document.getElementById('d-dec'), add = document.getElementById('d-add');
     if(inc) inc.addEventListener('click', ()=>{ if(qty < (stock[p.id]||0)){ qty++; render(); } });
     if(dec) dec.addEventListener('click', ()=>{ if(qty>1){ qty--; render(); } });
     if(add) add.addEventListener('click', ()=>{
       addToCart(p.id, qty);
-      detailView.hidden=true; shopView.hidden=false;
+      history.back();
     });
   };
   render();
   shopView.hidden = true;
+  adminView.hidden = true;
+  checkoutView.hidden = true;
   detailView.hidden = false;
+  if(push) history.pushState(null, '', `#product-${id}`);
   window.scrollTo(0,0);
 }
 
@@ -651,7 +640,7 @@ const adminView = document.getElementById('admin-view');
 function goShop(clearHash=true){
   shopView.hidden=false; adminView.hidden=true; detailView.hidden=true; checkoutView.hidden=true;
   navShop.classList.add('active');
-  if(clearHash && location.hash==='#admin') history.replaceState(null,'',location.pathname+location.search);
+  if(clearHash && location.hash) history.replaceState(null,'',location.pathname+location.search);
 }
 // Demo-only client-side password gate — visible in source, not real security.
 // Change this before sharing the link; use a real auth/back-end for a live store.
@@ -664,10 +653,13 @@ function goAdmin(){
   adminAuthed ? renderAdmin() : renderAdminLogin();
   window.scrollTo(0,0);
 }
-navShop.addEventListener('click', ()=> goShop());
+navShop.addEventListener('click', ()=>{ goShop(); openCatalog(); });
 
 function routeFromHash(){
-  if(location.hash === '#admin') goAdmin(); else goShop(false);
+  const hash = location.hash;
+  if(hash === '#admin') goAdmin();
+  else if(hash.startsWith('#product-')) openDetail(hash.slice('#product-'.length), false);
+  else goShop(false);
 }
 window.addEventListener('hashchange', routeFromHash);
 
@@ -758,6 +750,7 @@ if(heroParallax){
 loadCart();
 loadStock();
 loadOrders();
+renderFilters();
 renderGrid();
 renderCart();
 routeFromHash();
