@@ -59,11 +59,21 @@
   #catalog{background:linear-gradient(180deg, var(--blush) 0%, var(--cream) 340px);}
   .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:8px;}
   .section-head h2{font-size:34px;font-style:italic;color:var(--rose);}
-  .filter-row{display:flex;gap:10px;flex-wrap:wrap;}
-  .filter-row button{font-size:14px;padding:6px 14px;border:1px solid var(--line);border-radius:20px;}
-  .filter-row button.active{background:var(--rose);color:#fff;border-color:var(--rose);}
-  .filter-row button{transition:border-color .15s ease, color .15s ease;}
-  .filter-row button:hover:not(.active){border-color:var(--rose);color:var(--rose);}
+  .cat-section{border-bottom:1px solid var(--line);}
+  .cat-section:first-child{border-top:1px solid var(--line);}
+  .cat-header{width:100%;display:flex;align-items:center;justify-content:space-between;padding:18px 4px;text-align:left;font-family:'Cormorant Garamond',serif;}
+  .cat-header .cat-name{font-size:24px;font-style:italic;color:var(--plum);}
+  .cat-header .cat-meta{display:flex;align-items:center;gap:14px;}
+  .cat-header .cat-count{font-family:'Karla',sans-serif;font-size:13px;opacity:.6;}
+  .cat-chevron{display:inline-block;transition:transform .3s ease;font-size:14px;color:var(--rose);}
+  .cat-section.open .cat-chevron{transform:rotate(180deg);}
+  .cat-body{max-height:0;overflow:hidden;transition:max-height .45s ease;}
+  .cat-section.open .cat-body{max-height:3000px;}
+  .cat-body .grid{padding:8px 4px 28px;}
+  .social-row{display:flex;gap:16px;margin-top:20px;}
+  .social-btn{width:48px;height:48px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;letter-spacing:.02em;color:var(--rose);text-decoration:none;transition:transform .15s ease, background .15s ease, color .15s ease;}
+  .social-btn:hover{background:var(--rose);color:#fff;transform:translateY(-3px);}
+  #contact{padding-top:12px;}
 
   .grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:28px 22px;}
   .card{cursor:pointer;opacity:0;transform:translateY(16px);transition:opacity .5s ease, transform .5s ease, box-shadow .2s ease;}
@@ -164,6 +174,7 @@
     <div class="brand">Bloem &amp; Co.</div>
     <nav class="navlinks">
       <button id="nav-shop" class="active">Shop</button>
+      <a href="#contact" style="padding:4px 0;border-bottom:2px solid transparent;">Contact</a>
     </nav>
     <button class="cart-btn" id="open-cart">Cart <span class="cart-count" id="cart-count" hidden>0</span></button>
   </div>
@@ -188,9 +199,30 @@
   <section id="catalog">
     <div class="section-head">
       <h2>The catalog</h2>
-      <div class="filter-row" id="filters"></div>
     </div>
-    <div class="grid" id="product-grid"></div>
+    <div id="category-accordion"></div>
+  </section>
+
+  <section id="contact">
+    <div class="section-head">
+      <h2>Get in touch</h2>
+    </div>
+    <p style="max-width:48ch;opacity:.8;">Questions about an order, custom arrangements, or wholesale inquiries — reach out anytime.</p>
+    <div class="social-row">
+      <a href="https://instagram.com/bloemandco" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://facebook.com/bloemandco" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M13.5 21.9v-8.4h2.8l.4-3.3h-3.2V8.1c0-1 .3-1.6 1.7-1.6h1.6V3.6C16.5 3.6 15.3 3.5 14 3.5c-2.6 0-4.5 1.6-4.5 4.6v2.1H6.7v3.3h2.8v8.4h4Z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@bloemandco" target="_blank" rel="noopener" class="social-btn" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M15.5 3h-2.7v12.1a2.6 2.6 0 1 1-1.9-2.5v-2.8a5.4 5.4 0 1 0 4.6 5.3V9.2a7 7 0 0 0 4 1.3V7.8a4.3 4.3 0 0 1-4-4.8Z"/></svg>
+      </a>
+      <a href="https://wa.me/254700000000" target="_blank" rel="noopener" class="social-btn" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.9-1.3A9.5 9.5 0 1 0 12 2.5Zm0 1.8a7.7 7.7 0 1 1-4 14.3l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 0 1 12 4.3Z"/><path fill="currentColor" d="M9.1 7.3c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.3.9 2.6 1 2.8.1.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3-.3-.2-1.5-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.5-1.8-.1-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.2-.5.1-.2 0-.4 0-.5L9.1 7.3Z"/></svg>
+      </a>
+    </div>
+    <p style="margin-top:20px;font-size:14px;opacity:.65;">hello@bloemandco.co.ke &middot; +254 700 000 000</p>
   </section>
 
   <footer>Bloem &amp; Co.</footer>
@@ -225,7 +257,6 @@ const PRODUCTS = [
 ];
 const TAGS = ['all', ...Array.from(new Set(PRODUCTS.map(p=>p.tag)))];
 let cart = {}; // id -> qty
-let activeFilter = 'all';
 let stock = {}; // id -> qty on hand
 let orders = []; // {num, name, email, items:[{name,qty,price}], total, date}
 
@@ -263,19 +294,12 @@ function flowerSVG(tag, color){
     <circle cx="50" cy="50" r="7" fill="${c}" opacity=".95"/>
   </svg>`;
 }
-const grid = document.getElementById('product-grid');
-const filtersEl = document.getElementById('filters');
+const accordionEl = document.getElementById('category-accordion');
+const openCategories = new Set(); // tags currently expanded
 
-function renderFilters(){
-  filtersEl.innerHTML = TAGS.map(t=>`<button data-tag="${t}" class="${t===activeFilter?'active':''}">${t}</button>`).join('');
-  filtersEl.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{ activeFilter=b.dataset.tag; renderFilters(); renderGrid(); }));
-}
-
-function renderGrid(){
-  const list = activeFilter==='all' ? PRODUCTS : PRODUCTS.filter(p=>p.tag===activeFilter);
-  grid.innerHTML = list.map(p=>{
-    const soldOut = (stock[p.id]||0) <= 0;
-    return `
+function cardHTML(p){
+  const soldOut = (stock[p.id]||0) <= 0;
+  return `
     <div class="card" data-id="${p.id}" style="${soldOut?'opacity:.5;':''}">
       <div class="thumb" style="background:${p.color}1c">
         <img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"
@@ -286,23 +310,55 @@ function renderGrid(){
       <div class="price">${fmt(p.price)}</div>
       ${soldOut ? '<div class="add" style="opacity:.7;">Sold out</div>' : `<button class="add" data-add="${p.id}">Add to cart</button>`}
     </div>
-  `;}).join('');
-  grid.querySelectorAll('[data-add]').forEach(btn=>{
+  `;
+}
+
+function categoryLabel(tag){ return tag.charAt(0).toUpperCase() + tag.slice(1); }
+
+function renderGrid(){
+  const categories = TAGS.filter(t=>t!=='all');
+  accordionEl.innerHTML = categories.map(tag=>{
+    const items = PRODUCTS.filter(p=>p.tag===tag);
+    const isOpen = openCategories.has(tag);
+    return `
+    <div class="cat-section ${isOpen?'open':''}" data-tag="${tag}">
+      <button class="cat-header" data-toggle="${tag}">
+        <span class="cat-name">${categoryLabel(tag)}</span>
+        <span class="cat-meta"><span class="cat-count">${items.length} item${items.length===1?'':'s'}</span><span class="cat-chevron">&#9662;</span></span>
+      </button>
+      <div class="cat-body">
+        <div class="grid">${items.map(cardHTML).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  accordionEl.querySelectorAll('[data-toggle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tag = btn.dataset.toggle;
+      openCategories.has(tag) ? openCategories.delete(tag) : openCategories.add(tag);
+      const section = btn.closest('.cat-section');
+      section.classList.toggle('open');
+      if(section.classList.contains('open')) revealCards(section);
+    });
+  });
+  accordionEl.querySelectorAll('[data-add]').forEach(btn=>{
     btn.addEventListener('click', e=>{ e.stopPropagation(); addToCart(btn.dataset.add); });
   });
-  grid.querySelectorAll('.card').forEach(card=>{
+  accordionEl.querySelectorAll('.card').forEach(card=>{
     card.addEventListener('click', ()=> openDetail(card.dataset.id));
   });
-  revealCards();
+  accordionEl.querySelectorAll('.cat-section.open').forEach(revealCards);
 }
 
 let revealObserver = null;
-function revealCards(){
-  if(revealObserver) revealObserver.disconnect();
-  revealObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); revealObserver.unobserve(e.target); } });
-  }, {threshold:.15});
-  grid.querySelectorAll('.card').forEach(c=> revealObserver.observe(c));
+function revealCards(scope){
+  const root = scope || document;
+  if(!revealObserver){
+    revealObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in-view'); revealObserver.unobserve(e.target); } });
+    }, {threshold:.15});
+  }
+  root.querySelectorAll('.card:not(.in-view)').forEach(c=> revealObserver.observe(c));
 }
 
 const detailView = document.getElementById('detail-view');
@@ -702,7 +758,6 @@ if(heroParallax){
 loadCart();
 loadStock();
 loadOrders();
-renderFilters();
 renderGrid();
 renderCart();
 routeFromHash();
